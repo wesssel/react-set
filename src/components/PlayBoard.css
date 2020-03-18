@@ -1,0 +1,11 @@
+.board {
+  margin: 0 auto;
+  width: 600px;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.board-card {
+  flex: 1 1 150px;
+  margin-bottom: 20px;
+}
