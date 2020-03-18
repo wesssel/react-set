@@ -1,4 +1,6 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# React SET!
+
+>  [Try here!](https://set-orpin.now.sh/).
 
 ## Available Scripts
 
