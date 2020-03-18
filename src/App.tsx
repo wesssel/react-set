@@ -45,10 +45,8 @@ export class App extends React.Component<{}, AppState> {
   }
 
   removeCards(indexes: number[]) {
-    indexes.forEach((index) => {
-      this.setState({
-        cards: this.state.cards.filter((_, i) => i !== index)
-      })
+    this.setState({
+      cards: this.state.cards.filter((_, index) => !indexes.includes(index))
     })
   }
 
