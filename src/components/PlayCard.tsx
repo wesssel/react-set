@@ -2,14 +2,14 @@ import * as React from 'react';
 import './PlayCard.css'
 import { Card } from 'src/types';
 
-interface CardProps {
+interface Props {
   card: Card
   active: boolean
   onClick: () => void
 }
 
-export class PlayCard extends React.Component<CardProps, {}> {
-  constructor(props: CardProps) {
+export class PlayCard extends React.Component<Props, {}> {
+  constructor(props: Props) {
     super(props);
 
     this.state = {}
@@ -25,10 +25,6 @@ export class PlayCard extends React.Component<CardProps, {}> {
       classes.push('play-card__active')
     }
     return classes.join(' ')
-  }
-
-  click() {
-    console.log('alive')
   }
 
   render() {

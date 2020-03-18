@@ -5,13 +5,12 @@ import { Card } from 'src/types';
 
 interface Props {
   cards: Card[]
-  onRemoveCards: (indexes: number[]) => void
+  onValidate: (cards: Card[]) => void
 }
 
 interface State {
   selectedIndexes: number[]
   isSet?: boolean
-  points: number
 }
 
 export class PlayBoard extends React.Component<Props, State> {
@@ -21,66 +20,34 @@ export class PlayBoard extends React.Component<Props, State> {
     this.state = {
       selectedIndexes: [],
       isSet: undefined,
-      points: 0
     }
   }
 
-  get selectedCards(): Card[] {
+  get cardsSelected(): Card[] {
     return this.state.selectedIndexes.map((i) => this.props.cards[i])
   }
 
-  get isSet(): boolean {
-    const isColorSet = this.getIsUnique(this.selectedCards, 'color') || this.getIsSame(this.selectedCards, 'color')
-    const isShapeSet = this.getIsUnique(this.selectedCards, 'shape') || this.getIsSame(this.selectedCards, 'shape')
-    const isFillSet = this.getIsUnique(this.selectedCards, 'fill') || this.getIsSame(this.selectedCards, 'fill')
-    const isAmountSet = this.getIsUnique(this.selectedCards, 'amount') || this.getIsSame(this.selectedCards, 'amount')
-
-    return this.isCardsSelected && isColorSet && isShapeSet && isFillSet && isAmountSet
-  }
-
-  get isCardsSelected(): boolean {
+  get isCardCombination(): boolean {
     return this.state.selectedIndexes.length === 3
   }
 
-  getIsUnique(array: any[], type: string): boolean {
-    return array
-      .map((item) => item[type])
-      .every((item, i, items) => items.filter(c => c === item).length === 1)
-  }
-
-  getIsSame(array: any[], type: string): boolean {
-    return array
-      .map((item) => item[type])
-      .every((color, i, colors) => colors[0] === color)
-  }
-
   handleClick(index: number) {
-    if (!this.isCardsSelected) {
-      if (!this.state.selectedIndexes.includes(index)) {
-        return this.setState({
-          selectedIndexes: [...this.state.selectedIndexes, index],
-        }, () => {
-          if (this.isCardsSelected) {
-            this.validate()
-          }
-        })
-      }
+    if (this.isCardCombination) { return }
 
+    if (!this.state.selectedIndexes.includes(index)) {
       return this.setState({
-        selectedIndexes: this.state.selectedIndexes.filter((i) => i !== index)
+        selectedIndexes: [...this.state.selectedIndexes, index],
+      }, () => {
+        if (this.isCardCombination) {
+          this.props.onValidate(this.cardsSelected)
+          this.setState({ selectedIndexes: [] })
+        }
       })
     }
-  }
 
-  validate() {
-    if (this.isSet === false) {
-      this.setState({ points: this.state.points - 1 })
-    } else {
-      this.setState({ points: this.state.points + 1 })
-      this.props.onRemoveCards(this.state.selectedIndexes)
-    }
-
-    this.setState({ selectedIndexes: [] })
+    return this.setState({
+      selectedIndexes: this.state.selectedIndexes.filter((i) => i !== index)
+    })
   }
 
   render() {
@@ -97,12 +64,8 @@ export class PlayBoard extends React.Component<Props, State> {
     });
 
     return (
-      <div>
-        <div>Points!: {this.state.points}</div>
-
-        <div className="board">
-          {cards}
-        </div>
+      <div className="board">
+        {cards}
       </div>
     );
   }

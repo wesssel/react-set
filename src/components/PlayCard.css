@@ -4,6 +4,7 @@
   border-radius: 5px;
   border: 1px solid lightgray;
   cursor: pointer;
+  transition: .3s;
 }
 
 .play-card__active {
