@@ -5,8 +5,8 @@ export enum Color {
 }
 
 export enum Shape {
-  DIAMOND = 'diamod',
   SQUIGGLE = 'squiggle',
+  DIAMOND = 'diamod',
   OVAL = 'oval',
 }
 
@@ -18,6 +18,7 @@ export enum Fill {
 
 
 export interface Card {
+  id: number
   color: Color
   shape: Shape
   fill: Fill

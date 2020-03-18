@@ -31,11 +31,11 @@ export class App extends React.Component<{}, AppState> {
   get newCards(): Card[] {
     const cards: Card[] = []
 
-    Object.values(Color).forEach((color) => {
+    Object.values(Fill).forEach((fill) => {
       Object.values(Shape).forEach((shape) => {
-        Object.values(Fill).forEach((fill) => {
+        Object.values(Color).forEach((color) => {
           for (let index = 0; index < AMOUNT_SHAPES; index++) {
-            cards.push({ color, shape, fill, amount: index + 1 })
+            cards.push({ color, shape, fill, amount: index + 1, id: cards.length + 1 })
           }
         })
       })

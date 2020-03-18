@@ -15,28 +15,8 @@ export class PlayCard extends React.Component<CardProps, {}> {
     this.state = {}
   }
 
-  get amount(): number {
-    return this.props.card.amount
-  }
-
-  get color(): string {
-    return this.props.card.color
-  }
-
-  get shape(): string {
-    return this.props.card.shape
-  }
-
-  get fill(): string {
-    return this.props.card.fill
-  }
-
-  get elements(): JSX.Element[] {
-    const elements = []
-    for (let index = 0; index < this.amount; index++) {
-      elements.push(<div key={index} style={{ background: this.color }}>{this.shape} - {this.fill}</div>)
-    }
-    return elements
+  get imageSrc(): string {
+    return `https://www.setgame.com/sites/all/modules/setgame_set/assets/images/new/${this.props.card.id}.png`
   }
 
   get classNames(): string {
@@ -54,7 +34,7 @@ export class PlayCard extends React.Component<CardProps, {}> {
   render() {
     return (
       <div className={this.classNames} onClick={this.props.onClick}>
-        {this.elements}
+        <img className="playcard__image" src={this.imageSrc} alt="card" />
       </div>
     );
   }
