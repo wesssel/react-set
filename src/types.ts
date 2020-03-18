@@ -25,3 +25,7 @@ export interface Card {
   amount: number
 }
 
+export enum Player {
+  SELF = 'self',
+  BOT = 'bot',
+}

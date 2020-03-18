@@ -2,22 +2,26 @@ import * as React from 'react';
 
 interface Props {
   points: number
+  pointsBot: number
   cardsLeft: number
   shuffle: () => void
+  enableBot: () => void
 }
 
 interface State {
   secondsPlayed: number
   showTimer: boolean
+  isBotEnabled: boolean
 }
 
-export class PlayScore extends React.Component<Props, State> {
+export class PlaySettngs extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
     this.state = {
       secondsPlayed: 0,
-      showTimer: true
+      showTimer: true,
+      isBotEnabled: false
     }
   }
 
@@ -38,6 +42,11 @@ export class PlayScore extends React.Component<Props, State> {
     this.setState({ showTimer: !this.state.showTimer })
   }
 
+  enableBot() {
+    this.setState({ isBotEnabled: true })
+    this.props.enableBot()
+  }
+
   render() {
     return (
       <div>
@@ -51,6 +60,13 @@ export class PlayScore extends React.Component<Props, State> {
           <li>
             Points: {this.props.points}
           </li>
+          {this.state.isBotEnabled
+            ?
+            <li>
+              Bot Points: {this.props.pointsBot}
+            </li>
+            : ''
+          }
           <li>
             Card Left: {this.props.cardsLeft}
           </li>
@@ -60,6 +76,13 @@ export class PlayScore extends React.Component<Props, State> {
           <li>
             <button onClick={this.toggleTimer.bind(this)}>{this.state.showTimer ? 'Hide Timer' : 'Show Timer'}</button>
           </li>
+          {this.state.isBotEnabled === false
+            ?
+            <li>
+              <button onClick={this.enableBot.bind(this)}>Play Against Bot</button>
+            </li>
+            : ''
+          }
         </ul>
       </div>
     );

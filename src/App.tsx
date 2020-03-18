@@ -1,9 +1,10 @@
 import * as React from 'react';
 import './App.css'
-import { Card, Color, Shape, Fill } from './types';
+import { Card, Color, Shape, Fill, Player } from './types';
 import { shuffleArray } from './utils/array';
 import { PlayBoard } from './components/PlayBoard'
-import { PlayScore } from './components/PlayScore'
+import { PlaySettngs } from './components/PlaySettngs'
+import { getRandom } from './utils/random';
 
 const MAX_CARDS_SHOWN = 12
 const AMOUNT_SHAPES = 3
@@ -11,6 +12,7 @@ const AMOUNT_SHAPES = 3
 interface State {
   cards: Card[]
   points: number
+  pointsBot: number
 }
 
 export class App extends React.Component<{}, State> {
@@ -19,6 +21,7 @@ export class App extends React.Component<{}, State> {
 
     this.state = {
       points: 0,
+      pointsBot: 0,
       cards: []
     }
   }
@@ -99,12 +102,28 @@ export class App extends React.Component<{}, State> {
       .every((color, i, colors) => colors[0] === color)
   }
 
-  validate(cards: Card[]) { // @move to app
+  validate(cards: Card[], player: Player) {
     if (this.getIsSet(cards) === false) {
-      this.setState({ points: this.state.points - 1 })
+      this.addPoint(false, player)
     } else {
-      this.setState({ points: this.state.points + 1 })
+      this.addPoint(true, player)
       this.removeCards(cards)
+    }
+  }
+
+  addPoint(isPointAdded: boolean, player: Player) {
+    if (player === Player.SELF) {
+      if (isPointAdded) {
+        this.setState({ points: this.state.points + 1 })
+      } else {
+        this.setState({ points: this.state.points - 1 })
+      }
+    } else if (player === Player.BOT) {
+      if (isPointAdded) {
+        this.setState({ pointsBot: this.state.pointsBot + 1 })
+      } else {
+        this.setState({ pointsBot: this.state.pointsBot - 1 })
+      }
     }
   }
 
@@ -114,17 +133,30 @@ export class App extends React.Component<{}, State> {
     })
   }
 
+  enableBot() {
+    setTimeout(() => {
+      if (this.cardCombinationsSets[0]) {
+        this.validate(this.cardCombinationsSets[0], Player.BOT)
+      }
+
+      this.enableBot()
+    }, getRandom(5000, 20000));
+  }
+
+
   render() {
     return (
       <div className="app">
-        <PlayScore
+        <PlaySettngs
           points={this.state.points}
           cardsLeft={this.state.cards.length}
+          enableBot={() => this.enableBot()}
+          pointsBot={this.state.pointsBot}
           shuffle={() => this.setShuffledCards(this.state.cards)}
         />
         <PlayBoard
           cards={this.cardsShown}
-          onValidate={(cards) => this.validate(cards)}
+          onValidate={(cards) => this.validate(cards, Player.SELF)}
         />
       </div>
     );
