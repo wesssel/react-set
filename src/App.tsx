@@ -27,12 +27,6 @@ export class App extends React.Component<{}, State> {
     this.setShuffledCards(this.cardsNew)
   }
 
-  componentDidUpdate() {
-    if (this.cardCombinationsSets.length === 0) {
-      this.setShuffledCards(this.state.cards)
-    }
-  }
-
   get cardsShown(): Card[] {
     return this.state.cards.slice(0, MAX_CARDS_SHOWN)
   }
@@ -81,14 +75,7 @@ export class App extends React.Component<{}, State> {
   }
 
   setShuffledCards(cards: Card[]) {
-    return this.setState({ cards: shuffleArray(cards) },
-      () => {
-        console.log(this.cardCombinationsSets.length)
-
-        if (this.cardCombinationsSets.length === 0) {
-          this.setShuffledCards(this.state.cards)
-        }
-      })
+    this.setState({ cards: shuffleArray(cards) })
   }
 
   getIsSet(cards: Card[]): boolean {
@@ -130,7 +117,11 @@ export class App extends React.Component<{}, State> {
   render() {
     return (
       <div className="app">
-        <PlayScore points={this.state.points} cardsLeft={this.state.cards.length} />
+        <PlayScore
+          points={this.state.points}
+          cardsLeft={this.state.cards.length}
+          shuffle={() => this.setShuffledCards(this.state.cards)}
+        />
         <PlayBoard
           cards={this.cardsShown}
           onValidate={(cards) => this.validate(cards)}
