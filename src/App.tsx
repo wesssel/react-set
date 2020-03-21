@@ -5,9 +5,12 @@ import { shuffleArray } from './utils/array';
 import { PlayBoard } from './components/PlayBoard'
 import { PlaySettngs } from './components/PlaySettngs'
 import { getRandom } from './utils/random';
+import { Firebase } from './firebase';
 
 const MAX_CARDS_SHOWN = 12
 const AMOUNT_SHAPES = 3
+
+const firebase = new Firebase()
 
 interface State {
   cards: Card[]
@@ -26,8 +29,22 @@ export class App extends React.Component<{}, State> {
     }
   }
 
-  componentWillMount() {
-    this.setShuffledCards(this.cardsNew)
+  async componentWillMount() {
+    if (this.gameIsNew) {
+      await this.setShuffledCards(this.cardsNew)
+      await firebase.setGameCards(this.state.cards)
+    } else {
+      const cards = await firebase.getGameCards()
+      this.setState({ cards })
+    }
+  }
+
+  get gameId(): string {
+    return window.location.search.includes('?game=') ? window.location.search.split('?game=')[1] : ''
+  }
+
+  get gameIsNew(): boolean {
+    return this.gameId === ''
   }
 
   get cardsShown(): Card[] {
