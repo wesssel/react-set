@@ -21,8 +21,8 @@ export class Firebase {
   }
 
   public async setGameCards(cards: Card[]): Promise<void> {
-    cards.forEach((card) => {
-      this.database.ref(`games/${this.gameId}/cards`).push(this.transformCardIndexes(card))
+    cards.forEach((card, index) => {
+      this.database.ref(`games/${this.gameId}/cards/${index}`).set(this.transformCardIndexes(card))
     })
   }
 
