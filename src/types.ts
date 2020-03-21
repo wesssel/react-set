@@ -29,3 +29,10 @@ export enum Player {
   SELF = 'self',
   OTHER = 'other',
 }
+
+export interface PlayerScore {
+  setsCount: number,
+  secondsPlayed: number
+  playerName: string
+}
+

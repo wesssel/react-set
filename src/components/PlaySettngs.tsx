@@ -1,18 +1,21 @@
 import * as React from 'react';
+import { Firebase } from 'src/firebase';
 
 interface Props {
-  points: number
-  pointsBot: number
+  sets: number
   cardsLeft: number
-  shuffle: () => void
-  enableBot: () => void
+  playerName: string
+  setsAvailable: number
+  gameEnded: boolean
+  firebase: Firebase
 }
 
 interface State {
   secondsPlayed: number
   showTimer: boolean
-  isBotEnabled: boolean
 }
+
+let timerInterval: NodeJS.Timeout
 
 export class PlaySettngs extends React.Component<Props, State> {
   constructor(props: Props) {
@@ -21,12 +24,19 @@ export class PlaySettngs extends React.Component<Props, State> {
     this.state = {
       secondsPlayed: 0,
       showTimer: true,
-      isBotEnabled: false
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.props.gameEnded === true) {
+      clearInterval(timerInterval)
+
+      this.props.firebase.setGamePlayerScore(this.props.sets, this.state.secondsPlayed)
     }
   }
 
   componentDidMount() {
-    setInterval(() => {
+    timerInterval = setInterval(() => {
       this.setState({ secondsPlayed: this.state.secondsPlayed + 1 })
     }, 1000)
   }
@@ -42,11 +52,6 @@ export class PlaySettngs extends React.Component<Props, State> {
     this.setState({ showTimer: !this.state.showTimer })
   }
 
-  enableBot() {
-    this.setState({ isBotEnabled: true })
-    this.props.enableBot()
-  }
-
   render() {
     return (
       <div>
@@ -58,31 +63,17 @@ export class PlaySettngs extends React.Component<Props, State> {
             : ''
           }
           <li>
-            Points: {this.props.points}
+            Sets {this.props.playerName}: {this.props.sets}
           </li>
-          {this.state.isBotEnabled
-            ?
-            <li>
-              Bot Points: {this.props.pointsBot}
-            </li>
-            : ''
-          }
           <li>
             Card Left: {this.props.cardsLeft}
           </li>
           <li>
-            <button onClick={this.props.shuffle}>Shuffle!</button>
-          </li>
-          <li>
             <button onClick={this.toggleTimer.bind(this)}>{this.state.showTimer ? 'Hide Timer' : 'Show Timer'}</button>
           </li>
-          {this.state.isBotEnabled === false
-            ?
-            <li>
-              <button onClick={this.enableBot.bind(this)}>Play Against Bot</button>
-            </li>
-            : ''
-          }
+          <li>
+            Current possible sets: {this.props.setsAvailable}
+          </li>
         </ul>
       </div>
     );

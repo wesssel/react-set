@@ -1,6 +1,6 @@
 import * as firebase from 'firebase/app'
 import 'firebase/database'
-import { Card, Fill, Color, Shape } from './types'
+import { Card, Fill, Color, Shape, PlayerScore } from './types'
 
 type CardIndexes = [number, number, number, number, number]
 
@@ -39,6 +39,14 @@ export class Firebase {
     })
   }
 
+  public async setGamePlayerScore(setsCount: number, secondsPlayed: number) {
+    this.database.ref(`games/leaderboards/${this.playerId}`).set({
+      setsCount,
+      secondsPlayed,
+      playerName: this.playerId,
+    })
+  }
+
   public getGameCards(): Promise<Card[]> {
     return this.database
       .ref(`games/${this.gameId}/cards`)
@@ -65,6 +73,20 @@ export class Firebase {
         })
 
         return sets
+      })
+  }
+
+  public getGamePlayerScores(): Promise<PlayerScore[]> {
+    return this.database
+      .ref(`games/leaderboards`)
+      .once('value')
+      .then((snapshots) => {
+        const scores: PlayerScore[] = []
+        snapshots.forEach((snapshot) => {
+          scores.push(snapshot.val())
+        })
+
+        return scores
       })
   }
 

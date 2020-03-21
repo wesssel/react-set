@@ -2,10 +2,13 @@ import * as React from 'react';
 import './App.css'
 import { PlayGame } from './components/PlayGame';
 import { PlayStart } from './components/PlayStart';
+import { Firebase } from './firebase';
 
 interface State {
   playerName: string
 }
+
+const firebase = new Firebase()
 
 export class App extends React.Component<{}, State> {
   constructor(props: {}) {
@@ -24,8 +27,8 @@ export class App extends React.Component<{}, State> {
     return (
       <div className="app">
         {this.state.playerName.length
-          ? <PlayGame />
-          : <PlayStart onSubmit={(name: string) => this.startGame(name)} />
+          ? <PlayGame firebase={firebase} playerName={this.state.playerName} />
+          : <PlayStart firebase={firebase} onSubmit={(name: string) => this.startGame(name)} />
         }
       </div>
     );

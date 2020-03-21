@@ -3,50 +3,56 @@ import { Card, Color, Shape, Fill, Player } from '../types';
 import { shuffleArray } from '../utils/array';
 import { PlayBoard } from '../components/PlayBoard'
 import { PlaySettngs } from '../components/PlaySettngs'
-import { getRandom } from '../utils/random';
 import { Firebase } from '../firebase';
 
 const MAX_CARDS_SHOWN = 12
 const AMOUNT_SHAPES = 3
 
-const firebase = new Firebase()
+interface Props {
+  playerName: string
+  firebase: Firebase
+}
 
 interface State {
   cards: Card[]
   selfSets: Card[][]
   otherSets: Card[][]
-  points: number
-  pointsBot: number
+  gameEnded: boolean
 }
 
-export class PlayGame extends React.Component<{}, State> {
-  constructor(props: {}) {
+export class PlayGame extends React.Component<Props, State> {
+  constructor(props: Props) {
     super(props);
 
     this.state = {
-      points: 0,
-      pointsBot: 0,
       selfSets: [],
       otherSets: [],
-      cards: []
+      cards: [],
+      gameEnded: false,
     }
   }
 
   async componentWillMount() {
     if (this.gameIsNew) {
       await this.setShuffledCards(this.cardsNew)
-      await firebase.setGameCards(this.state.cards)
+      await this.props.firebase.setGameCards(this.state.cards)
     } else {
-      const cards = await firebase.getGameCards()
-      const sets = await firebase.getGameSets()
+      const cards = await this.props.firebase.getGameCards()
+      const sets = await this.props.firebase.getGameSets()
       this.setState({ cards, selfSets: sets })
-      this.setState({ points: sets.length })
     }
+
+    setInterval(() => {
+      if (this.cardCombinationsSets[0]) {
+        this.validate(this.cardCombinationsSets[0], Player.SELF)
+      }
+    }, 100)
   }
 
   componentDidUpdate() {
-    firebase.setGameCards(this.state.cards)
-    firebase.setGameSets(this.state.selfSets)
+    this.validateCombinations()
+    this.props.firebase.setGameCards(this.state.cards)
+    this.props.firebase.setGameSets(this.state.selfSets)
   }
 
   get gameId(): string {
@@ -131,12 +137,24 @@ export class PlayGame extends React.Component<{}, State> {
 
   validate(cards: Card[], player: Player) {
     if (this.getIsSet(cards) === false) {
-      this.addPoint(false, player)
+      this.removeSet(player, cards)
     } else {
-      this.addPoint(true, player)
       this.addSet(player, cards)
       this.removeCards(cards)
     }
+  }
+
+  validateCombinations() {
+    if (this.cardCombinationsSets.length > 0 || this.state.gameEnded === true) {
+      return
+    }
+
+    if (this.state.cards.length < MAX_CARDS_SHOWN) {
+      this.setState({ gameEnded: true })
+      return
+    }
+
+    this.setShuffledCards(this.state.cards)
   }
 
   addSet(player: Player, cards: Card[]) {
@@ -147,29 +165,14 @@ export class PlayGame extends React.Component<{}, State> {
           cards,
         ]
       })
-    } else if (player === Player.OTHER) {
-      this.setState({
-        otherSets: [
-          ...this.state.otherSets,
-          cards,
-        ]
-      })
     }
   }
 
-  addPoint(isPointAdded: boolean, player: Player) {
+  removeSet(player: Player, cards: Card[]) {
     if (player === Player.SELF) {
-      if (isPointAdded) {
-        this.setState({ points: this.state.points + 1 })
-      } else {
-        this.setState({ points: this.state.points - 1 })
-      }
-    } else if (player === Player.OTHER) {
-      if (isPointAdded) {
-        this.setState({ pointsBot: this.state.pointsBot + 1 })
-      } else {
-        this.setState({ pointsBot: this.state.pointsBot - 1 })
-      }
+      this.setState({
+        selfSets: this.state.selfSets.filter((_, index) => index !== 0),
+      })
     }
   }
 
@@ -179,26 +182,17 @@ export class PlayGame extends React.Component<{}, State> {
     })
   }
 
-  enableBot() {
-    setTimeout(() => {
-      if (this.cardCombinationsSets[0]) {
-        this.validate(this.cardCombinationsSets[0], Player.OTHER)
-      }
-
-      this.enableBot()
-    }, getRandom(5000, 20000));
-  }
-
-
   render() {
     return (
       <div>
+        {this.state.gameEnded ? <h1>Game Ended!</h1> : ''}
         <PlaySettngs
-          points={this.state.points}
+          firebase={this.props.firebase}
+          sets={this.state.selfSets.length}
+          setsAvailable={this.cardCombinationsSets.length}
           cardsLeft={this.state.cards.length}
-          enableBot={() => this.enableBot()}
-          pointsBot={this.state.pointsBot}
-          shuffle={() => this.setShuffledCards(this.state.cards)}
+          playerName={this.props.playerName}
+          gameEnded={this.state.gameEnded}
         />
         <PlayBoard
           cards={this.cardsShown}
