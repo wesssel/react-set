@@ -5,13 +5,17 @@
   flex-wrap: wrap;
 }
 
+.board-card {
+  flex: 1 1 150px;
+  margin-bottom: 20px;
+}
+
 @media only screen and (max-width: 600px) {
   .board {
     width: 100%;
   }
-}
-
-.board-card {
-  flex: 1 1 150px;
-  margin-bottom: 20px;
+  .board-card {
+    flex: 1 1 100px;
+    /* margin-bottom: 20px; */
+  }
 }
