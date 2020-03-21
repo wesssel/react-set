@@ -21,7 +21,7 @@ export class Firebase {
   }
 
   public async setGameDate(gameId: string): Promise<void> {
-    this.database.ref(`games/${gameId}/createdAt`).set(new Date())
+    this.database.ref(`games/${gameId}/createdAt`).set(new Date().getTime())
   }
 
   public async setGameCards(gameId: string, cards: Card[]): Promise<void> {

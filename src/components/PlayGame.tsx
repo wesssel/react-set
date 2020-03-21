@@ -37,9 +37,9 @@ export class PlayGame extends React.Component<Props, State> {
   async componentWillMount() {
     if (this.gameIsNew) {
       this.setState({ gameId: Math.random().toString(36).substr(2, 9) })
-      await this.props.firebase.setGameDate(this.state.gameId)
       await this.setShuffledCards(this.cardsNew)
       await this.props.firebase.setGameCards(this.state.gameId, this.state.cards)
+      await this.props.firebase.setGameDate(this.state.gameId)
     } else {
       this.setState({ gameId: this.gameUrlId })
       const cards = await this.props.firebase.getGameCards(this.state.gameId)
