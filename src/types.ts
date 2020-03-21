@@ -31,7 +31,8 @@ export enum Player {
 }
 
 export interface PlayerScore {
-  setsCount: number,
+  secondsPerSet: number
+  setsCount: number
   secondsPlayed: number
   playerName: string
 }
