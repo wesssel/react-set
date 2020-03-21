@@ -2,6 +2,8 @@ import * as firebase from 'firebase/app'
 import 'firebase/database'
 import { Card, Fill, Color, Shape } from './types'
 
+type CardIndexes = [number, number, number, number, number]
+
 export class Firebase {
   private database: firebase.database.Database
   private config = {
@@ -58,7 +60,7 @@ export class Firebase {
       .then((snapshots) => {
         const sets: Card[][] = []
         snapshots.forEach((snapshot) => {
-          const cards = snapshot.val().map((indexes: [number, number, number, number, number]) => this.reverseTransformCardIndexes(indexes))
+          const cards = snapshot.val().map((indexes: CardIndexes) => this.reverseTransformCardIndexes(indexes))
           sets.push(cards)
         })
 
@@ -66,33 +68,17 @@ export class Firebase {
       })
   }
 
-  private transformCardIndexes(card: Card): [number, number, number, number, number] {
+  private transformCardIndexes(card: Card): CardIndexes {
     return [
       card.id,
-      this.transformCardFillIndex(card.fill),
-      this.transformCardShapeIndex(card.shape),
-      this.transformCardColorIndex(card.color),
-      this.transformCardAmountIndex(card.amount),
+      Object.values(Fill).indexOf(card.fill),
+      Object.values(Shape).indexOf(card.shape),
+      Object.values(Color).indexOf(card.color),
+      card.amount - 1,
     ]
   }
 
-  private transformCardFillIndex(fill: Fill): number {
-    return Object.values(Fill).indexOf(fill);
-  }
-
-  private transformCardShapeIndex(shape: Shape): number {
-    return Object.values(Shape).indexOf(shape);
-  }
-
-  private transformCardColorIndex(color: Color): number {
-    return Object.values(Color).indexOf(color);
-  }
-
-  private transformCardAmountIndex(amount: number): number {
-    return amount - 1
-  }
-
-  private reverseTransformCardIndexes(indexes: [number, number, number, number, number]): Card {
+  private reverseTransformCardIndexes(indexes: CardIndexes): Card {
     return {
       id: indexes[0],
       fill: Object.values(Fill)[indexes[1]],
