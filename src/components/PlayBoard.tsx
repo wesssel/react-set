@@ -23,12 +23,24 @@ export class PlayBoard extends React.Component<Props, State> {
     }
   }
 
+  componentWillMount() {
+    this.handleKeyBoard()
+  }
+
   get cardsSelected(): Card[] {
     return this.state.selectedIndexes.map((i) => this.props.cards[i])
   }
 
   get isCardCombination(): boolean {
     return this.state.selectedIndexes.length === 3
+  }
+
+  handleKeyBoard() {
+    document.onkeydown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        this.setState({ selectedIndexes: [] })
+      }
+    }
   }
 
   handleClick(index: number) {
