@@ -24,6 +24,10 @@ export class Firebase {
     this.database.ref(`games/${gameId}/createdAt`).set(new Date().getTime())
   }
 
+  public async setGameFinished(gameId: string): Promise<void> {
+    this.database.ref(`games/${gameId}/isFinished`).set(true)
+  }
+
   public async setGameCards(gameId: string, cards: Card[]): Promise<void> {
     this.database.ref(`games/${gameId}/cards/`).remove()
 
@@ -85,12 +89,6 @@ export class Firebase {
 
         return scores
       })
-  }
-
-  public async deleteGame(gameId: string): Promise<void> {
-    await this.database
-      .ref(`games/${gameId}`)
-      .remove()
   }
 
   private transformCardIndexes(card: Card): CardIndexes {
