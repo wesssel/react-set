@@ -37,6 +37,7 @@ export class PlaySettngs extends React.Component<Props, State> {
         secondsPlayed: this.state.secondsPlayed,
         playerName: this.props.playerName,
       })
+      await this.props.firebase.deleteGame(this.props.gameId)
     }
   }
 

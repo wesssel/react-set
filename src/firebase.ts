@@ -87,6 +87,12 @@ export class Firebase {
       })
   }
 
+  public async deleteGame(gameId: string): Promise<void> {
+    await this.database
+      .ref(`games/${gameId}`)
+      .remove()
+  }
+
   private transformCardIndexes(card: Card): CardIndexes {
     return [
       card.id,

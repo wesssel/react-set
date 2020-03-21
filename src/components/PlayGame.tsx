@@ -51,7 +51,7 @@ export class PlayGame extends React.Component<Props, State> {
     //   if (this.cardCombinationsSets[0]) {
     //     this.validate(this.cardCombinationsSets[0], Player.SELF)
     //   }
-    // }, 50)
+    // }, 200)
   }
 
   componentDidUpdate() {
@@ -145,7 +145,12 @@ export class PlayGame extends React.Component<Props, State> {
       this.removeSet(player, cards)
     } else {
       this.addSet(player, cards)
-      this.removeCards(cards)
+
+      if (this.state.cards.length > (MAX_CARDS_SHOWN + cards.length)) {
+        this.replaceCards(cards)
+      } else {
+        this.removeCards(cards)
+      }
     }
   }
 
@@ -185,6 +190,19 @@ export class PlayGame extends React.Component<Props, State> {
     this.setState({
       cards: this.state.cards.filter((c) => !cards.map((c) => c.id).includes(c.id))
     })
+  }
+
+  replaceCards(cards: Card[]) {
+    const replacedCards = this.state.cards.map((card) => {
+      const cardsToReplace = cards.map((c) => c.id)
+      if (cardsToReplace.includes(card.id)) {
+        card = this.state.cards[MAX_CARDS_SHOWN + cardsToReplace.indexOf(card.id)]
+      }
+      return card
+    })
+    replacedCards.splice(MAX_CARDS_SHOWN, 3)
+
+    this.setState({ cards: replacedCards })
   }
 
   render() {
