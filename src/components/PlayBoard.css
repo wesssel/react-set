@@ -8,6 +8,7 @@
 .board-card {
   flex: 1 1 150px;
   margin-bottom: 20px;
+  transition: .2s;
 }
 
 @media only screen and (max-width: 600px) {
@@ -16,6 +17,5 @@
   }
   .board-card {
     flex: 1 1 100px;
-    /* margin-bottom: 20px; */
   }
 }

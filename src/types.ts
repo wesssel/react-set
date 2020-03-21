@@ -27,5 +27,12 @@ export interface Card {
 
 export enum Player {
   SELF = 'self',
-  BOT = 'bot',
+  OTHER = 'other',
 }
+
+export interface PlayerScore {
+  setsCount: number,
+  secondsPlayed: number
+  playerName: string
+}
+
