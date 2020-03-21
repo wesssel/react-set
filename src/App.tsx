@@ -14,6 +14,8 @@ const firebase = new Firebase()
 
 interface State {
   cards: Card[]
+  selfSets: Card[][]
+  otherSets: Card[][]
   points: number
   pointsBot: number
 }
@@ -25,6 +27,8 @@ export class App extends React.Component<{}, State> {
     this.state = {
       points: 0,
       pointsBot: 0,
+      selfSets: [],
+      otherSets: [],
       cards: []
     }
   }
@@ -35,8 +39,15 @@ export class App extends React.Component<{}, State> {
       await firebase.setGameCards(this.state.cards)
     } else {
       const cards = await firebase.getGameCards()
-      this.setState({ cards })
+      const sets = await firebase.getGameSets()
+      this.setState({ cards, selfSets: sets })
+      this.setState({ points: sets.length })
     }
+  }
+
+  componentDidUpdate() {
+    firebase.setGameCards(this.state.cards)
+    firebase.setGameSets(this.state.selfSets)
   }
 
   get gameId(): string {
@@ -124,7 +135,26 @@ export class App extends React.Component<{}, State> {
       this.addPoint(false, player)
     } else {
       this.addPoint(true, player)
+      this.addSet(player, cards)
       this.removeCards(cards)
+    }
+  }
+
+  addSet(player: Player, cards: Card[]) {
+    if (player === Player.SELF) {
+      this.setState({
+        selfSets: [
+          ...this.state.selfSets,
+          cards,
+        ]
+      })
+    } else if (player === Player.OTHER) {
+      this.setState({
+        otherSets: [
+          ...this.state.otherSets,
+          cards,
+        ]
+      })
     }
   }
 
@@ -135,7 +165,7 @@ export class App extends React.Component<{}, State> {
       } else {
         this.setState({ points: this.state.points - 1 })
       }
-    } else if (player === Player.BOT) {
+    } else if (player === Player.OTHER) {
       if (isPointAdded) {
         this.setState({ pointsBot: this.state.pointsBot + 1 })
       } else {
@@ -153,7 +183,7 @@ export class App extends React.Component<{}, State> {
   enableBot() {
     setTimeout(() => {
       if (this.cardCombinationsSets[0]) {
-        this.validate(this.cardCombinationsSets[0], Player.BOT)
+        this.validate(this.cardCombinationsSets[0], Player.OTHER)
       }
 
       this.enableBot()

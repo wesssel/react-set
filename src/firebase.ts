@@ -13,16 +13,27 @@ export class Firebase {
     appId: process.env.REACT_APP_FIREBASE_APP,
   }
   private gameId: string = 'test-game'
+  private playerId: string = ''
 
   constructor() {
-    console.log(process.env.REACT_APP_FIREBASE_ID)
     firebase.initializeApp(this.config)
     this.database = firebase.database()
+    this.playerId = 'test-id'
   }
 
   public async setGameCards(cards: Card[]): Promise<void> {
+    this.database.ref(`games/${this.gameId}/cards/`).remove()
+
     cards.forEach((card, index) => {
       this.database.ref(`games/${this.gameId}/cards/${index}`).set(this.transformCardIndexes(card))
+    })
+  }
+
+  public async setGameSets(sets: Card[][]) {
+    sets.forEach((set, index) => {
+      const setIndexes = set.map((card) => this.transformCardIndexes(card))
+
+      this.database.ref(`games/${this.gameId}/players/${this.playerId}/sets/${index}`).set(setIndexes)
     })
   }
 
@@ -37,6 +48,21 @@ export class Firebase {
         })
 
         return cards
+      })
+  }
+
+  public getGameSets(): Promise<Card[][]> {
+    return this.database
+      .ref(`games/${this.gameId}/players/${this.playerId}/sets`)
+      .once('value')
+      .then((snapshots) => {
+        const sets: Card[][] = []
+        snapshots.forEach((snapshot) => {
+          const cards = snapshot.val().map((indexes: [number, number, number, number, number]) => this.reverseTransformCardIndexes(indexes))
+          sets.push(cards)
+        })
+
+        return sets
       })
   }
 

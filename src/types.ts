@@ -27,5 +27,5 @@ export interface Card {
 
 export enum Player {
   SELF = 'self',
-  BOT = 'bot',
+  OTHER = 'other',
 }
