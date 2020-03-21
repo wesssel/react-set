@@ -8,6 +8,7 @@ interface Props {
   setsAvailable: number
   gameEnded: boolean
   firebase: Firebase
+  gameId: string
 }
 
 interface State {
@@ -31,7 +32,7 @@ export class PlaySettngs extends React.Component<Props, State> {
     if (this.props.gameEnded === true) {
       clearInterval(timerInterval)
 
-      await this.props.firebase.setGamePlayerScore({
+      await this.props.firebase.setPlayerScore({
         setsCount: this.props.sets,
         secondsPlayed: this.state.secondsPlayed,
         playerName: this.props.playerName,
@@ -60,6 +61,9 @@ export class PlaySettngs extends React.Component<Props, State> {
     return (
       <div>
         <ul>
+          <li>
+            Game ID: {this.props.gameId}
+          </li>
           {this.state.showTimer
             ? <li>
               Timeplayed: {this.timeString}

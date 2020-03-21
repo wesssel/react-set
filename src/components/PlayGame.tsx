@@ -14,6 +14,7 @@ interface Props {
 }
 
 interface State {
+  gameId: string
   cards: Card[]
   selfSets: Card[][]
   otherSets: Card[][]
@@ -25,6 +26,7 @@ export class PlayGame extends React.Component<Props, State> {
     super(props);
 
     this.state = {
+      gameId: '',
       selfSets: [],
       otherSets: [],
       cards: [],
@@ -34,11 +36,14 @@ export class PlayGame extends React.Component<Props, State> {
 
   async componentWillMount() {
     if (this.gameIsNew) {
+      this.setState({ gameId: Math.random().toString(36).substr(2, 9) })
+      await this.props.firebase.setGameDate(this.state.gameId)
       await this.setShuffledCards(this.cardsNew)
-      await this.props.firebase.setGameCards(this.state.cards)
+      await this.props.firebase.setGameCards(this.state.gameId, this.state.cards)
     } else {
-      const cards = await this.props.firebase.getGameCards()
-      const sets = await this.props.firebase.getGameSets(this.props.playerName)
+      this.setState({ gameId: this.gameUrlId })
+      const cards = await this.props.firebase.getGameCards(this.state.gameId)
+      const sets = await this.props.firebase.getGameSets(this.state.gameId, this.props.playerName)
       this.setState({ cards, selfSets: sets })
     }
 
@@ -51,16 +56,16 @@ export class PlayGame extends React.Component<Props, State> {
 
   componentDidUpdate() {
     this.validateCombinations()
-    this.props.firebase.setGameCards(this.state.cards)
-    this.props.firebase.setGameSets(this.props.playerName, this.state.selfSets)
+    this.props.firebase.setGameCards(this.state.gameId, this.state.cards)
+    this.props.firebase.setGameSets(this.state.gameId, this.props.playerName, this.state.selfSets)
   }
 
-  get gameId(): string {
+  get gameUrlId(): string {
     return window.location.search.includes('?game=') ? window.location.search.split('?game=')[1] : ''
   }
 
   get gameIsNew(): boolean {
-    return this.gameId === ''
+    return this.gameUrlId === ''
   }
 
   get cardsShown(): Card[] {
@@ -187,6 +192,7 @@ export class PlayGame extends React.Component<Props, State> {
       <div>
         {this.state.gameEnded ? <h1>Game Ended!</h1> : ''}
         <PlaySettngs
+          gameId={this.state.gameId}
           firebase={this.props.firebase}
           sets={this.state.selfSets.length}
           setsAvailable={this.cardCombinationsSets.length}

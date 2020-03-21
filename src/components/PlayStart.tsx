@@ -24,7 +24,7 @@ export class PlayStart extends React.Component<Props, State> {
   }
 
   async componentWillMount() {
-    const scores = await this.props.firebase.getGamePlayerScores()
+    const scores = await this.props.firebase.getPlayerScores()
 
     this.setState({ scores })
   }
