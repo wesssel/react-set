@@ -27,11 +27,15 @@ export class PlaySettngs extends React.Component<Props, State> {
     }
   }
 
-  componentDidUpdate() {
+  async componentDidUpdate() {
     if (this.props.gameEnded === true) {
       clearInterval(timerInterval)
 
-      this.props.firebase.setGamePlayerScore(this.props.sets, this.state.secondsPlayed)
+      await this.props.firebase.setGamePlayerScore({
+        setsCount: this.props.sets,
+        secondsPlayed: this.state.secondsPlayed,
+        playerName: this.props.playerName,
+      })
     }
   }
 

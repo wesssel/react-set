@@ -38,21 +38,21 @@ export class PlayGame extends React.Component<Props, State> {
       await this.props.firebase.setGameCards(this.state.cards)
     } else {
       const cards = await this.props.firebase.getGameCards()
-      const sets = await this.props.firebase.getGameSets()
+      const sets = await this.props.firebase.getGameSets(this.props.playerName)
       this.setState({ cards, selfSets: sets })
     }
 
-    setInterval(() => {
-      if (this.cardCombinationsSets[0]) {
-        this.validate(this.cardCombinationsSets[0], Player.SELF)
-      }
-    }, 100)
+    // setInterval(() => {
+    //   if (this.cardCombinationsSets[0]) {
+    //     this.validate(this.cardCombinationsSets[0], Player.SELF)
+    //   }
+    // }, 50)
   }
 
   componentDidUpdate() {
     this.validateCombinations()
     this.props.firebase.setGameCards(this.state.cards)
-    this.props.firebase.setGameSets(this.state.selfSets)
+    this.props.firebase.setGameSets(this.props.playerName, this.state.selfSets)
   }
 
   get gameId(): string {

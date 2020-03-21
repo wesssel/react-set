@@ -15,12 +15,10 @@ export class Firebase {
     appId: process.env.REACT_APP_FIREBASE_APP,
   }
   private gameId: string = 'test-game'
-  private playerId: string = ''
 
   constructor() {
     firebase.initializeApp(this.config)
     this.database = firebase.database()
-    this.playerId = 'test-id'
   }
 
   public async setGameCards(cards: Card[]): Promise<void> {
@@ -31,20 +29,16 @@ export class Firebase {
     })
   }
 
-  public async setGameSets(sets: Card[][]) {
+  public async setGameSets(playerId: string, sets: Card[][]) {
     sets.forEach((set, index) => {
       const setIndexes = set.map((card) => this.transformCardIndexes(card))
 
-      this.database.ref(`games/${this.gameId}/players/${this.playerId}/sets/${index}`).set(setIndexes)
+      this.database.ref(`games/${this.gameId}/players/${playerId}/sets/${index}`).set(setIndexes)
     })
   }
 
-  public async setGamePlayerScore(setsCount: number, secondsPlayed: number) {
-    this.database.ref(`games/leaderboards/${this.playerId}`).set({
-      setsCount,
-      secondsPlayed,
-      playerName: this.playerId,
-    })
+  public async setGamePlayerScore(score: PlayerScore) {
+    this.database.ref(`games/leaderboards`).push(score)
   }
 
   public getGameCards(): Promise<Card[]> {
@@ -61,9 +55,9 @@ export class Firebase {
       })
   }
 
-  public getGameSets(): Promise<Card[][]> {
+  public getGameSets(playerId: string): Promise<Card[][]> {
     return this.database
-      .ref(`games/${this.gameId}/players/${this.playerId}/sets`)
+      .ref(`games/${this.gameId}/players/${playerId}/sets`)
       .once('value')
       .then((snapshots) => {
         const sets: Card[][] = []

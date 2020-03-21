@@ -29,6 +29,12 @@ export class PlayStart extends React.Component<Props, State> {
     this.setState({ scores })
   }
 
+  get scoreSorted(): PlayerScore[] {
+    return this.state.scores.sort((a, b) => {
+      return b.setsCount - a.setsCount || a.secondsPlayed - b.secondsPlayed 
+    })
+  }
+
   handleInput(event: any) {
     this.setState({ name: event.target.value });
   }
@@ -45,7 +51,7 @@ export class PlayStart extends React.Component<Props, State> {
   }
 
   render() {
-    const scores = this.state.scores.map((score, index) =>
+    const scores = this.scoreSorted.map((score, index) =>
       <li key={index}>{score.playerName}: {score.setsCount} sets in {this.getTimeString(score.secondsPlayed)}</li>
     )
 
