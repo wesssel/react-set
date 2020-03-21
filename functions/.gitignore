@@ -1,0 +1,14 @@
+## Compiled JavaScript files
+**/*.js
+**/*.js.map
+/lib/*.json
+/lib/**/*.json
+
+src/keys/**/*.json
+
+# Typescript v1 declaration files
+typings/
+
+node_modules/
+
+firebase-debug.log
