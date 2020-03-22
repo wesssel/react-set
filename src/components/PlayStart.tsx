@@ -56,7 +56,7 @@ export class PlayStart extends React.Component<Props, State> {
   render() {
     const scores = this.scoreSorted.map((score, index) =>
       <li key={index}>
-        {score.playerName}: {score.setsCount}, {this.getTimeString(score.secondsPlayed)} => {score.secondsPerSet.toFixed(0)} seconds per set
+        {score.playerName}: {score.setsCount}, {this.getTimeString(score.secondsPlayed)} => {score.secondsPerSet.toFixed(2)} seconds per set
       </li>
     )
 
