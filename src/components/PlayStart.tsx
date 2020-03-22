@@ -29,6 +29,10 @@ export class PlayStart extends React.Component<Props, State> {
     this.setState({ scores })
   }
 
+  get isValidName(): boolean {
+    return !this.state.name.includes(' ')
+  }
+
   get scoreSorted(): PlayerScore[] {
     return this.state.scores
       .map((score) => {
@@ -56,7 +60,7 @@ export class PlayStart extends React.Component<Props, State> {
   render() {
     const scores = this.scoreSorted.map((score, index) =>
       <li key={index}>
-        {score.playerName}: {score.setsCount}, {this.getTimeString(score.secondsPlayed)} => {score.secondsPerSet.toFixed(2)} seconds per set
+        {score.playerName}: {score.setsCount}, {this.getTimeString(score.secondsPlayed)} => {score.secondsPerSet.toFixed(2)} sec per set
       </li>
     )
 
@@ -64,7 +68,8 @@ export class PlayStart extends React.Component<Props, State> {
       <div className="play-start">
         <h1>Set!</h1>
         <input type="text" placeholder="Name" onChange={this.handleInput.bind(this)} />
-        {this.state.name.length ? <button onClick={this.handleSubmit.bind(this)}>Start!</button> : ''}
+        {!this.isValidName ? 'No spaces in name' : ''}
+        {this.state.name.length && this.isValidName ? <button onClick={this.handleSubmit.bind(this)}>Start!</button> : ''}
 
         <ol>
           {scores}

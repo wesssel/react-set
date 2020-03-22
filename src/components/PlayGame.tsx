@@ -47,11 +47,11 @@ export class PlayGame extends React.Component<Props, State> {
       this.setState({ cards, selfSets: sets })
     }
 
-    // setInterval(() => {
-    //   if (this.cardCombinationsSets[0]) {
-    //     this.validate(this.cardCombinationsSets[0], Player.SELF)
-    //   }
-    // }, 200)
+    setInterval(() => {
+      if (this.cardCombinationsSets[0]) {
+        this.validate(this.cardCombinationsSets[0], Player.SELF)
+      }
+    }, 200)
   }
 
   componentDidUpdate() {

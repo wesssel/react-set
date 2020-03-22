@@ -45,7 +45,7 @@ export class Firebase {
   }
 
   public async setPlayerScore(score: PlayerScore) {
-    this.database.ref(`leaderboards`).push(score)
+    this.database.ref(`leaderboards/${score.playerName}`).set(score)
   }
 
   public getGameCards(gameId: string): Promise<Card[]> {
@@ -80,6 +80,7 @@ export class Firebase {
   public getPlayerScores(): Promise<PlayerScore[]> {
     return this.database
       .ref(`leaderboards`)
+      .limitToLast(15)
       .once('value')
       .then((snapshots) => {
         const scores: PlayerScore[] = []
