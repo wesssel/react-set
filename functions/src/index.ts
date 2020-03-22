@@ -7,7 +7,7 @@ import serviceAccount = require('./keys/admin-key.json')
 admin.initializeApp({
   // @ts-ignore
   credential: admin.credential.cert(serviceAccount),
-  databaseURL: `https://${process.env.REACT_APP_FIREBASE_APP}.firebaseio.com`,
+  databaseURL: `https://set-react.firebaseio.com`,
 });
 
 export const gameCleanupInterval = functions.pubsub
