@@ -110,7 +110,6 @@ export class Firebase {
             playerName: snapshot.key,
           })
         })
-        console.log({ players })
         document.dispatchEvent(new CustomEvent('playersUpdate', {
           detail: players
         }))

@@ -5,6 +5,7 @@ interface Props {
   sets: number
   cardsLeft: number
   playerName: string
+  opponentName: string
   setsAvailable: number
   gameEnded: boolean
   firebase: Firebase

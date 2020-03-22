@@ -30,7 +30,7 @@ export class App extends React.Component<{}, State> {
 
   async setPlayer(playerName: string, gameId: string) {
     if (gameId === '') {
-      await this.setState({ playerName, gameId: 'test-game' }) // Math.random().toString(36).substr(2, 9)
+      await this.setState({ playerName, gameId: 'test' }) // Math.random().toString(36).substr(2, 9)
     } else {
       await this.setState({ playerName, gameId, gameIsNew: false })
     }
@@ -53,6 +53,7 @@ export class App extends React.Component<{}, State> {
         gameIsNew={this.state.gameIsNew}
         gameId={this.state.gameId}
         playerName={this.state.playerName}
+        opponentName={this.state.opponentName}
       />
     }
 

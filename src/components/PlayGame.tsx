@@ -4,6 +4,7 @@ import { shuffleArray } from '../utils/array';
 import { PlayBoard } from '../components/PlayBoard'
 import { PlayStats } from '../components/PlayStats'
 import { Firebase } from '../firebase';
+import { sleep } from 'src/utils/sleep';
 
 const MAX_CARDS_SHOWN = 12
 const AMOUNT_SHAPES = 3
@@ -12,6 +13,7 @@ interface Props {
   gameIsNew: boolean
   gameId: string
   playerName: string
+  opponentName: string
   firebase: Firebase
 }
 
@@ -20,6 +22,7 @@ interface State {
   selfSets: Card[][]
   otherSets: Card[][]
   gameEnded: boolean
+  gameStarted: boolean
 }
 
 export class PlayGame extends React.Component<Props, State> {
@@ -31,17 +34,25 @@ export class PlayGame extends React.Component<Props, State> {
       otherSets: [],
       cards: [],
       gameEnded: false,
+      gameStarted: false,
     }
   }
 
   async componentWillMount() {
+    await sleep(500) // delay till cards are loaded
+
     if (this.props.gameIsNew) {
+      console.log('isnew')
       await this.setShuffledCards(this.cardsNew)
       await this.props.firebase.setGameCards(this.props.gameId, this.state.cards)
+      await this.setState({ gameStarted: true })
     } else {
+      console.log('isexisting')
       const cards = await this.props.firebase.getGameCards(this.props.gameId)
-      const sets = await this.props.firebase.getGameSets(this.props.gameId, this.props.playerName)
-      this.setState({ cards, selfSets: sets })
+      // console.log(cards)
+      // const sets = await this.props.firebase.getGameSets(this.props.gameId, this.props.playerName)
+      await this.setState({ cards })
+      await this.setState({ gameStarted: true })
     }
 
     // setInterval(() => {
@@ -52,6 +63,7 @@ export class PlayGame extends React.Component<Props, State> {
   }
 
   componentDidUpdate() {
+    if (this.state.gameStarted === false) { return }
     this.validateCombinations()
     this.props.firebase.setGameCards(this.props.gameId, this.state.cards)
     this.props.firebase.setGameSets(this.props.gameId, this.props.playerName, this.state.selfSets)
@@ -201,6 +213,7 @@ export class PlayGame extends React.Component<Props, State> {
           setsAvailable={this.cardCombinationsSets.length}
           cardsLeft={this.state.cards.length}
           playerName={this.props.playerName}
+          opponentName={this.props.opponentName}
           gameEnded={this.state.gameEnded}
         />
         <PlayBoard
