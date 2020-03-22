@@ -25,12 +25,9 @@ export interface Card {
   amount: number
 }
 
-export enum Player {
-  SELF = 'self',
-  OTHER = 'other',
-}
-
-export interface PlayerScore {
+export interface Player {
+  isReady: boolean
+  joinedAt?: number
   secondsPerSet: number
   setsCount: number
   secondsPlayed: number

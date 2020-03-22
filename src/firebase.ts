@@ -1,6 +1,6 @@
 import * as firebase from 'firebase/app'
 import 'firebase/database'
-import { Card, Fill, Color, Shape, PlayerScore } from './types'
+import { Card, Fill, Color, Shape, Player } from './types'
 
 type CardIndexes = [number, number, number, number, number]
 
@@ -36,6 +36,14 @@ export class Firebase {
     })
   }
 
+  public async setGamePlayerJoined(gameId: string, playerId: string) {
+    this.database.ref(`games/${gameId}/players/${playerId}/joinedAt`).set(new Date().getTime())
+  }
+
+  public async setGamePlayerIsReady(gameId: string, playerId: string) {
+    this.database.ref(`games/${gameId}/players/${playerId}/isReady`).set(true)
+  }
+
   public async setGameSets(gameId: string, playerId: string, sets: Card[][]) {
     sets.forEach((set, index) => {
       const setIndexes = set.map((card) => this.transformCardIndexes(card))
@@ -44,7 +52,7 @@ export class Firebase {
     })
   }
 
-  public async setPlayerScore(score: PlayerScore) {
+  public async setPlayerScore(score: Player) {
     this.database.ref(`leaderboards`).push(score)
   }
 
@@ -77,17 +85,35 @@ export class Firebase {
       })
   }
 
-  public getPlayerScores(): Promise<PlayerScore[]> {
+  public getPlayerScores(): Promise<Player[]> {
     return this.database
       .ref(`leaderboards`)
       .once('value')
       .then((snapshots) => {
-        const scores: PlayerScore[] = []
+        const scores: Player[] = []
         snapshots.forEach((snapshot) => {
           scores.push(snapshot.val())
         })
 
         return scores
+      })
+  }
+
+  public onGamePlayerUpdate(gameId: string) {
+    return this.database
+      .ref(`games/${gameId}/players`)
+      .on('value', (snapshots) => {
+        const players: Player[] = []
+        snapshots.forEach((snapshot) => {
+          players.push({
+            ...snapshot.val(),
+            playerName: snapshot.key,
+          })
+        })
+        console.log({ players })
+        document.dispatchEvent(new CustomEvent('playersUpdate', {
+          detail: players
+        }))
       })
   }
 

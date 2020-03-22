@@ -18,7 +18,7 @@ interface State {
 
 let timerInterval: NodeJS.Timeout
 
-export class PlaySettngs extends React.Component<Props, State> {
+export class PlayStats extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
@@ -33,6 +33,7 @@ export class PlaySettngs extends React.Component<Props, State> {
       clearInterval(timerInterval)
 
       await this.props.firebase.setPlayerScore({
+        isReady: true,
         secondsPerSet: this.state.secondsPlayed / this.props.sets,
         setsCount: this.props.sets,
         secondsPlayed: this.state.secondsPlayed,

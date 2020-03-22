@@ -1,20 +1,21 @@
 import * as React from 'react';
-import { Card, Color, Shape, Fill, Player } from '../types';
+import { Card, Color, Shape, Fill } from '../types';
 import { shuffleArray } from '../utils/array';
 import { PlayBoard } from '../components/PlayBoard'
-import { PlaySettngs } from '../components/PlaySettngs'
+import { PlayStats } from '../components/PlayStats'
 import { Firebase } from '../firebase';
 
 const MAX_CARDS_SHOWN = 12
 const AMOUNT_SHAPES = 3
 
 interface Props {
+  gameIsNew: boolean
+  gameId: string
   playerName: string
   firebase: Firebase
 }
 
 interface State {
-  gameId: string
   cards: Card[]
   selfSets: Card[][]
   otherSets: Card[][]
@@ -26,7 +27,6 @@ export class PlayGame extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      gameId: '',
       selfSets: [],
       otherSets: [],
       cards: [],
@@ -35,37 +35,26 @@ export class PlayGame extends React.Component<Props, State> {
   }
 
   async componentWillMount() {
-    if (this.gameIsNew) {
-      this.setState({ gameId: Math.random().toString(36).substr(2, 9) })
+    if (this.props.gameIsNew) {
       await this.setShuffledCards(this.cardsNew)
-      await this.props.firebase.setGameCards(this.state.gameId, this.state.cards)
-      await this.props.firebase.setGameDate(this.state.gameId)
+      await this.props.firebase.setGameCards(this.props.gameId, this.state.cards)
     } else {
-      this.setState({ gameId: this.gameUrlId })
-      const cards = await this.props.firebase.getGameCards(this.state.gameId)
-      const sets = await this.props.firebase.getGameSets(this.state.gameId, this.props.playerName)
+      const cards = await this.props.firebase.getGameCards(this.props.gameId)
+      const sets = await this.props.firebase.getGameSets(this.props.gameId, this.props.playerName)
       this.setState({ cards, selfSets: sets })
     }
 
     // setInterval(() => {
     //   if (this.cardCombinationsSets[0]) {
-    //     this.validate(this.cardCombinationsSets[0], Player.SELF)
+    //     this.validate(this.cardCombinationsSets[0])
     //   }
     // }, 200)
   }
 
   componentDidUpdate() {
     this.validateCombinations()
-    this.props.firebase.setGameCards(this.state.gameId, this.state.cards)
-    this.props.firebase.setGameSets(this.state.gameId, this.props.playerName, this.state.selfSets)
-  }
-
-  get gameUrlId(): string {
-    return window.location.search.includes('?game=') ? window.location.search.split('?game=')[1] : ''
-  }
-
-  get gameIsNew(): boolean {
-    return this.gameUrlId === ''
+    this.props.firebase.setGameCards(this.props.gameId, this.state.cards)
+    this.props.firebase.setGameSets(this.props.gameId, this.props.playerName, this.state.selfSets)
   }
 
   get cardsShown(): Card[] {
@@ -140,11 +129,11 @@ export class PlayGame extends React.Component<Props, State> {
       .every((color, i, colors) => colors[0] === color)
   }
 
-  validate(cards: Card[], player: Player) {
+  validate(cards: Card[]) {
     if (this.getIsSet(cards) === false) {
-      this.removeSet(player, cards)
+      this.removeSet(cards)
     } else {
-      this.addSet(player, cards)
+      this.addSet(cards)
 
       if (this.state.cards.length > (MAX_CARDS_SHOWN + cards.length)) {
         this.replaceCards(cards)
@@ -167,23 +156,19 @@ export class PlayGame extends React.Component<Props, State> {
     this.setShuffledCards(this.state.cards)
   }
 
-  addSet(player: Player, cards: Card[]) {
-    if (player === Player.SELF) {
-      this.setState({
-        selfSets: [
-          ...this.state.selfSets,
-          cards,
-        ]
-      })
-    }
+  addSet(cards: Card[]) {
+    this.setState({
+      selfSets: [
+        ...this.state.selfSets,
+        cards,
+      ]
+    })
   }
 
-  removeSet(player: Player, cards: Card[]) {
-    if (player === Player.SELF) {
-      this.setState({
-        selfSets: this.state.selfSets.filter((_, index) => index !== 0),
-      })
-    }
+  removeSet(cards: Card[]) {
+    this.setState({
+      selfSets: this.state.selfSets.filter((_, index) => index !== 0),
+    })
   }
 
   removeCards(cards: Card[]) {
@@ -209,8 +194,8 @@ export class PlayGame extends React.Component<Props, State> {
     return (
       <div>
         {this.state.gameEnded ? <h1>Game Ended!</h1> : ''}
-        <PlaySettngs
-          gameId={this.state.gameId}
+        <PlayStats
+          gameId={this.props.gameId}
           firebase={this.props.firebase}
           sets={this.state.selfSets.length}
           setsAvailable={this.cardCombinationsSets.length}
@@ -220,7 +205,7 @@ export class PlayGame extends React.Component<Props, State> {
         />
         <PlayBoard
           cards={this.cardsShown}
-          onValidate={(cards) => this.validate(cards, Player.SELF)}
+          onValidate={(cards) => this.validate(cards)}
         />
       </div>
     );
