@@ -32,7 +32,7 @@ export class PlaySettngs extends React.Component<Props, State> {
     if (this.props.gameEnded === true) {
       clearInterval(timerInterval)
 
-      await this.props.firebase.setPlayerScore({
+      await this.props.firebase.setPlayerScoreIfImproved({
         secondsPerSet: this.state.secondsPlayed / this.props.sets,
         setsCount: this.props.sets,
         secondsPlayed: this.state.secondsPlayed,

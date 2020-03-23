@@ -44,8 +44,17 @@ export class Firebase {
     })
   }
 
-  public async setPlayerScore(score: PlayerScore) {
-    this.database.ref(`leaderboards/${score.playerName}`).set(score)
+  public async setPlayerScoreIfImproved(score: PlayerScore) {
+    await this.database
+      .ref(`leaderboards/${score.playerName}`)
+      .once('value')
+      .then((snapshot) => {
+        const player: PlayerScore = snapshot.val()
+
+        if (player.secondsPerSet > score.secondsPerSet) {
+          this.database.ref(`leaderboards/${score.playerName}`).set(score)
+        }
+      })
   }
 
   public getGameCards(gameId: string): Promise<Card[]> {
