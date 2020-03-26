@@ -116,7 +116,9 @@ export class PlayGame extends React.Component<Props, State> {
   }
 
   setShuffledCards(cards: Card[]) {
-    this.setState({ cards: shuffleArray(cards) })
+    if (cards.length) {
+      this.setState({ cards: shuffleArray(cards) })
+    }
   }
 
   getIsSet(cards: Card[]): boolean {
