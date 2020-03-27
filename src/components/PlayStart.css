@@ -5,3 +5,16 @@
   justify-content: center;
   flex-direction: column;
 }
+
+.github-logo-link {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  bottom: 40px;
+  right: 40px;
+
+}
+
+.github-logo {
+  width: 100%;
+}

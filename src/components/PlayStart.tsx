@@ -74,6 +74,9 @@ export class PlayStart extends React.Component<Props, State> {
         <ol>
           {scores}
         </ol>
+        <a href="https://github.com/wesssel/react-set" className="github-logo-link" target="_blank" rel="noopener noreferrer">
+          <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" className="github-logo" alt="github" />
+        </a>
       </div>
     );
   }
