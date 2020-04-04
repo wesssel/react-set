@@ -1,8 +1,6 @@
 import * as firebase from 'firebase/app'
 import 'firebase/database'
-import { Card, Fill, Color, Shape, Player } from './types'
-
-type CardIndexes = [number, number, number, number, number]
+import { Card, Fill, Color, Shape, Player, CardIndexes } from './types'
 
 export class Firebase {
   private database: firebase.database.Database
@@ -21,44 +19,45 @@ export class Firebase {
   }
 
   public async setGameDate(gameId: string): Promise<void> {
-    this.database.ref(`games/${gameId}/createdAt`).set(new Date().getTime())
+    this.database.ref(`/test/games/${gameId}/createdAt`).set(new Date().getTime())
   }
 
   public async setGameFinished(gameId: string): Promise<void> {
-    this.database.ref(`games/${gameId}/isFinished`).set(true)
+    this.database.ref(`/test/games/${gameId}/isFinished`).set(true)
   }
 
   public async setGameCards(gameId: string, cards: Card[]): Promise<void> {
-    this.database.ref(`games/${gameId}/cards/`).remove()
+    console.log({ cards })
+    this.database.ref(`/test/games/${gameId}/cards/`).remove()
 
     cards.forEach((card, index) => {
-      this.database.ref(`games/${gameId}/cards/${index}`).set(this.transformCardIndexes(card))
+      this.database.ref(`/test/games/${gameId}/cards/${index}`).set(this.transformCardIndexes(card))
     })
   }
 
   public async setGamePlayerJoined(gameId: string, playerId: string) {
-    this.database.ref(`games/${gameId}/players/${playerId}/joinedAt`).set(new Date().getTime())
+    this.database.ref(`/test/games/${gameId}/players/${playerId}/joinedAt`).set(new Date().getTime())
   }
 
   public async setGamePlayerIsReady(gameId: string, playerId: string) {
-    this.database.ref(`games/${gameId}/players/${playerId}/isReady`).set(true)
+    this.database.ref(`/test/games/${gameId}/players/${playerId}/isReady`).set(true)
   }
 
   public async setGameSets(gameId: string, playerId: string, sets: Card[][]) {
     sets.forEach((set, index) => {
       const setIndexes = set.map((card) => this.transformCardIndexes(card))
 
-      this.database.ref(`games/${gameId}/players/${playerId}/sets/${index}`).set(setIndexes)
+      this.database.ref(`/test/games/${gameId}/players/${playerId}/sets/${index}`).set(setIndexes)
     })
   }
 
   public async setPlayerScore(score: Player) {
-    this.database.ref(`leaderboards`).push(score)
+    this.database.ref(`/test/leaderboards`).push(score)
   }
 
   public getGameCards(gameId: string): Promise<Card[]> {
     return this.database
-      .ref(`games/${gameId}/cards`)
+      .ref(`/test/games/${gameId}/cards`)
       .once('value')
       .then((snapshots) => {
         const cards: Card[] = []
@@ -72,7 +71,7 @@ export class Firebase {
 
   public getGameSets(gameId: string, playerId: string): Promise<Card[][]> {
     return this.database
-      .ref(`games/${gameId}/players/${playerId}/sets`)
+      .ref(`/test/games/${gameId}/players/${playerId}/sets`)
       .once('value')
       .then((snapshots) => {
         const sets: Card[][] = []
@@ -87,7 +86,7 @@ export class Firebase {
 
   public getPlayerScores(): Promise<Player[]> {
     return this.database
-      .ref(`leaderboards`)
+      .ref(`/test/leaderboards`)
       .once('value')
       .then((snapshots) => {
         const scores: Player[] = []
@@ -101,17 +100,41 @@ export class Firebase {
 
   public onGamePlayerUpdate(gameId: string) {
     return this.database
-      .ref(`games/${gameId}/players`)
+      .ref(`/test/games/${gameId}/players`);
+  }
+
+  public onGameOpponentPlayerSetsUpdate(gameId: string, opponentName: string) {
+    return this.database
+      .ref(`/test/games/${gameId}/players`)
       .on('value', (snapshots) => {
-        const players: Player[] = []
         snapshots.forEach((snapshot) => {
-          players.push({
-            ...snapshot.val(),
-            playerName: snapshot.key,
+          const player: Player = snapshot.val()
+
+          if (player.playerName !== opponentName || player.sets === undefined) { return }
+
+          const sets: Card[][] = []
+          player.sets.forEach((set: CardIndexes[]) => {
+            sets.push(set.map((card) => this.reverseTransformCardIndexes(card)))
           })
+
+          document.dispatchEvent(new CustomEvent('opponentSetsUpdate', {
+            detail: sets
+          }))
         })
-        document.dispatchEvent(new CustomEvent('playersUpdate', {
-          detail: players
+      })
+  }
+
+  public onCardUpdate(gameId: string) {
+    return this.database
+      .ref(`/test/games/${gameId}/cards`)
+      .on('value', (snapshots) => {
+        const cards: Card[] = []
+        snapshots.forEach((snapshot) => {
+          cards.push(this.reverseTransformCardIndexes(snapshot.val()))
+        })
+
+        document.dispatchEvent(new CustomEvent('cardsUpdate', {
+          detail: cards
         }))
       })
   }

@@ -16,6 +16,7 @@ export enum Fill {
   OPEN = 'open',
 }
 
+export type CardIndexes = [number, number, number, number, number]
 
 export interface Card {
   id: number
@@ -32,5 +33,5 @@ export interface Player {
   setsCount: number
   secondsPlayed: number
   playerName: string
+  sets?: CardIndexes[][]
 }
-

@@ -3,6 +3,7 @@ import { Firebase } from 'src/firebase';
 
 interface Props {
   sets: number
+  opponentSets: number
   cardsLeft: number
   playerName: string
   opponentName: string
@@ -77,6 +78,11 @@ export class PlayStats extends React.Component<Props, State> {
           <li>
             Sets {this.props.playerName}: {this.props.sets}
           </li>
+          {this.props.opponentName.length &&
+            <li>
+              Sets {this.props.opponentName}: {this.props.opponentSets}
+            </li>
+          }
           <li>
             Card Left: {this.props.cardsLeft}
           </li>

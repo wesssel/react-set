@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Card, Color, Shape, Fill } from '../types';
+import { Card, Color, Shape, Fill, Player } from '../types';
 import { shuffleArray } from '../utils/array';
 import { PlayBoard } from '../components/PlayBoard'
 import { PlayStats } from '../components/PlayStats'
@@ -19,8 +19,8 @@ interface Props {
 
 interface State {
   cards: Card[]
-  selfSets: Card[][]
-  otherSets: Card[][]
+  sets: Card[][]
+  opponentSets: Card[][]
   gameEnded: boolean
   gameStarted: boolean
 }
@@ -30,30 +30,45 @@ export class PlayGame extends React.Component<Props, State> {
     super(props);
 
     this.state = {
-      selfSets: [],
-      otherSets: [],
+      sets: [],
+      opponentSets: [],
       cards: [],
       gameEnded: false,
       gameStarted: false,
     }
   }
 
-  async componentWillMount() {
-    await sleep(500) // delay till cards are loaded
+  componentWillMount() {
+    // this.props.firebase.onCardUpdate(this.props.gameId);
 
     if (this.props.gameIsNew) {
-      console.log('isnew')
-      await this.setShuffledCards(this.cardsNew)
-      await this.props.firebase.setGameCards(this.props.gameId, this.state.cards)
-      await this.setState({ gameStarted: true })
+      this.startGame()
     } else {
-      console.log('isexisting')
-      const cards = await this.props.firebase.getGameCards(this.props.gameId)
-      // console.log(cards)
-      // const sets = await this.props.firebase.getGameSets(this.props.gameId, this.props.playerName)
-      await this.setState({ cards })
-      await this.setState({ gameStarted: true })
+      this.joinGame()
     }
+
+    this.subscribeOpponentSets()
+    // (document as any).addEventListener('cardsUpdate', (event: { detail: Card[] }) => {
+    //   // console.log({ event })
+    //   // if (JSON.stringify(this.state.cards) === JSON.stringify(event.detail)) { return }
+
+    //   this.setState({ cards: event.detail })
+    // })
+    // await sleep(500) // delay till cards are loaded
+
+    // if (this.props.gameIsNew) {
+    //   console.log('isnew')
+    //   await this.setShuffledCards(this.cardsNew)
+    //   await this.props.firebase.setGameCards(this.props.gameId, this.state.cards)
+    //   await this.setState({ gameStarted: true })
+    // } else {
+    //   console.log('isexisting')
+    //   const cards = await this.props.firebase.getGameCards(this.props.gameId)
+    //   // console.log(cards)
+    //   // const sets = await this.props.firebase.getGameSets(this.props.gameId, this.props.playerName)
+    //   await this.setState({ cards })
+    //   await this.setState({ gameStarted: true })
+    // }
 
     // setInterval(() => {
     //   if (this.cardCombinationsSets[0]) {
@@ -66,7 +81,29 @@ export class PlayGame extends React.Component<Props, State> {
     if (this.state.gameStarted === false) { return }
     this.validateCombinations()
     this.props.firebase.setGameCards(this.props.gameId, this.state.cards)
-    this.props.firebase.setGameSets(this.props.gameId, this.props.playerName, this.state.selfSets)
+    this.props.firebase.setGameSets(this.props.gameId, this.props.playerName, this.state.sets)
+  }
+
+  async startGame() {
+    await this.setShuffledCards(this.cardsNew)
+    await this.props.firebase.setGameCards(this.props.gameId, this.state.cards)
+    await this.setState({ gameStarted: true })
+  }
+
+  async joinGame() {
+    const cards = await this.props.firebase.getGameCards(this.props.gameId)
+    console.log({ cards })
+    await this.setState({ cards })
+    await this.setState({ gameStarted: true })
+  }
+
+  subscribeOpponentSets() {
+    this.props.firebase.onGameOpponentPlayerSetsUpdate(this.props.gameId, this.props.opponentName);
+
+    (document as any).addEventListener('opponentSetsUpdate', (event: { detail: Card[][] }) => {
+      console.log(event.detail)
+      this.setState({ opponentSets: event.detail })
+    })
   }
 
   get cardsShown(): Card[] {
@@ -170,8 +207,8 @@ export class PlayGame extends React.Component<Props, State> {
 
   addSet(cards: Card[]) {
     this.setState({
-      selfSets: [
-        ...this.state.selfSets,
+      sets: [
+        ...this.state.sets,
         cards,
       ]
     })
@@ -179,7 +216,7 @@ export class PlayGame extends React.Component<Props, State> {
 
   removeSet(cards: Card[]) {
     this.setState({
-      selfSets: this.state.selfSets.filter((_, index) => index !== 0),
+      sets: this.state.sets.filter((_, index) => index !== 0),
     })
   }
 
@@ -209,11 +246,12 @@ export class PlayGame extends React.Component<Props, State> {
         <PlayStats
           gameId={this.props.gameId}
           firebase={this.props.firebase}
-          sets={this.state.selfSets.length}
+          sets={this.state.sets.length}
           setsAvailable={this.cardCombinationsSets.length}
           cardsLeft={this.state.cards.length}
           playerName={this.props.playerName}
           opponentName={this.props.opponentName}
+          opponentSets={this.state.opponentSets.length}
           gameEnded={this.state.gameEnded}
         />
         <PlayBoard

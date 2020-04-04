@@ -29,16 +29,20 @@ export class PlayPreGame extends React.Component<Props, State> {
   }
 
   componentWillMount() {
-    this.props.firebase.onGamePlayerUpdate(this.props.gameId);
+    this.props.firebase.onGamePlayerUpdate(this.props.gameId)
+      .on('value', (snapshots) => {
+        snapshots.forEach((snapshot) => {
+          const player: Player = {
+            ...snapshot.val(),
+            playerName: snapshot.key,
+          }
 
-    (document as any).addEventListener('playersUpdate', (event: { detail: Player[] }) => {
-      event.detail.forEach((player: Player) => {
-        if (this.props.playerName === player.playerName) { return }
+          if (this.props.playerName === player.playerName) { return }
 
-        this.setState({ opponentName: player.playerName, opponentIsReady: player.isReady })
-        this.startOnReady()
+          this.setState({ opponentName: player.playerName, opponentIsReady: player.isReady })
+          this.startOnReady()
+        })
       })
-    })
   }
 
   startOnReady() {
