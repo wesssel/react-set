@@ -1,0 +1,17 @@
+[debug] [2020-09-23T06:59:53.566Z] ----------------------------------------------------------------------
+[debug] [2020-09-23T06:59:53.568Z] Command:       /usr/local/bin/node /usr/local/bin/firebase deploy
+[debug] [2020-09-23T06:59:53.569Z] CLI Version:   8.2.0
+[debug] [2020-09-23T06:59:53.569Z] Platform:      darwin
+[debug] [2020-09-23T06:59:53.569Z] Node Version:  v10.20.0
+[debug] [2020-09-23T06:59:53.570Z] Time:          Wed Sep 23 2020 08:59:53 GMT+0200 (Central European Summer Time)
+[debug] [2020-09-23T06:59:53.570Z] ----------------------------------------------------------------------
+[debug] [2020-09-23T06:59:53.570Z] 
+[debug] [2020-09-23T06:59:53.581Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2020-09-23T06:59:53.582Z] > authorizing via signed-in user
+[debug] [2020-09-23T06:59:53.582Z] [iam] checking project set-react for permissions ["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]
+[debug] [2020-09-23T06:59:53.587Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/set-react:testIamPermissions  
+ {"permissions":["cloudfunctions.functions.create","cloudfunctions.functions.delete","cloudfunctions.functions.get","cloudfunctions.functions.list","cloudfunctions.functions.update","cloudfunctions.operations.get","firebase.projects.get"]}
+[debug] [2020-09-23T06:59:54.369Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Wed, 23 Sep 2020 06:59:54 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","server-timing":"gfet4t7; dur=612","alt-svc":"h3-Q050=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-27=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}
+[debug] [2020-09-23T06:59:54.371Z] >>> HTTP REQUEST POST https://iam.googleapis.com/v1/projects/set-react/serviceAccounts/set-react@appspot.gserviceaccount.com:testIamPermissions  
+ {"permissions":["iam.serviceAccounts.actAs"]}
+[debug] [2020-09-23T06:59:55.332Z] <<< HTTP RESPONSE 200 {"content-type":"application/json; charset=UTF-8","vary":"X-Origin, Referer, Origin,Accept-Encoding","date":"Wed, 23 Sep 2020 06:59:55 GMT","server":"ESF","cache-control":"private","x-xss-protection":"0","x-frame-options":"SAMEORIGIN","x-content-type-options":"nosniff","alt-svc":"h3-Q050=\":443\"; ma=2592000,h3-29=\":443\"; ma=2592000,h3-27=\":443\"; ma=2592000,h3-T051=\":443\"; ma=2592000,h3-T050=\":443\"; ma=2592000,h3-Q046=\":443\"; ma=2592000,h3-Q043=\":443\"; ma=2592000,quic=\":443\"; ma=2592000; v=\"46,43\"","accept-ranges":"none","transfer-encoding":"chunked"}

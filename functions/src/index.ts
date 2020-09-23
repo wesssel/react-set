@@ -11,7 +11,7 @@ admin.initializeApp({
 });
 
 export const gameCleanupInterval = functions.pubsub
-  .schedule('every 4 hours')
+  .schedule('every 12 hours')
   .onRun((context) => new GameController().onGameCleanup());
 
 
