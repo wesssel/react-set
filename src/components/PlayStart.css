@@ -6,13 +6,22 @@
   flex-direction: column;
 }
 
+.play-start__intro {
+  display: flex;
+  margin-bottom: 40px;
+}
+
+.play-start__intro img {
+  height: 80px;
+  margin-left: 24px;
+}
+
 .github-logo-link {
   position: absolute;
   width: 40px;
   height: 40px;
   bottom: 40px;
   right: 40px;
-
 }
 
 .github-logo {

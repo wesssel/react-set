@@ -2,6 +2,7 @@ import * as React from 'react';
 import './PlayStart.css'
 import { Firebase } from 'src/firebase';
 import { PlayerScore } from 'src/types';
+import logo from '../assets/take-it.svg';
 
 interface Props {
   firebase: Firebase
@@ -66,7 +67,13 @@ export class PlayStart extends React.Component<Props, State> {
 
     return (
       <div className="play-start">
-        <h1>Set!</h1>
+        <div className="play-start__intro">
+          <h1>SET! by</h1>
+          <a href="https://takeit.agency/">
+            <img src={logo} alt="take it logo" />
+          </a>
+        </div>
+
         <input type="text" placeholder="Name" onChange={this.handleInput.bind(this)} />
         {!this.isValidName ? 'No spaces in name' : ''}
         {this.state.name.length && this.isValidName ? <button onClick={this.handleSubmit.bind(this)}>Start!</button> : ''}
@@ -74,9 +81,9 @@ export class PlayStart extends React.Component<Props, State> {
         <ol>
           {scores}
         </ol>
-        <a href="https://github.com/wesssel/react-set" className="github-logo-link" target="_blank" rel="noopener noreferrer">
+        {/* <a href="https://github.com/wesssel/react-set" className="github-logo-link" target="_blank" rel="noopener noreferrer">
           <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" className="github-logo" alt="github" />
-        </a>
+        </a> */}
       </div>
     );
   }
