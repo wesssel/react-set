@@ -51,7 +51,7 @@ export class Firebase {
       .then((snapshot) => {
         const player: PlayerScore = snapshot.val()
 
-        if (!snapshot.exists() && player.secondsPerSet > score.secondsPerSet) {
+        if (!snapshot.exists() || player.secondsPerSet > score.secondsPerSet) {
           this.database.ref(`leaderboards/${score.playerName}`).set(score)
         }
       })
